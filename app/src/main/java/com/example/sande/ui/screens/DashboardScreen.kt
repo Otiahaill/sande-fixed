@@ -19,19 +19,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ImageVector
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DrawScope
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.canvas.Canvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +38,6 @@ import com.example.sande.ui.theme.SandeShape
 import com.example.sande.ui.viewmodel.CatalogueViewModel
 import com.example.sande.ui.viewmodel.StockViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.platform.LocalView
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier) {
@@ -53,8 +49,8 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
     val stockViewModel: StockViewModel = viewModel {
         StockViewModel(app.movementRepository)
     }
-    val products by viewModel.products.collectAsState()
-    val stockByProduct by stockViewModel.stockByProduct.collectAsState()
+    val products: List<Product> by viewModel.products.collectAsState().value
+    val stockByProduct: Map<String, Long> by stockViewModel.stockByProduct.collectAsState().value
 
     val totalInventoryValue = products.sumOf { p ->
         val stock = stockByProduct[p.id] ?: 0L
@@ -184,7 +180,9 @@ private fun formatCurrency(value: Double): String {
     val str = value.toString()
     val dotIndex = str.indexOf('.')
     if (dotIndex >= 0) {
-        return "\$${str.substring(0, dotIndex)}.${str.substring(dotIndex + 1, minOf(dotIndex + 3, str.length))}"
+        val decimals = str.substring(dotIndex + 1)
+        val cents = if (decimals.length >= 2) decimals.substring(0, 2) else decimals + "0"
+        return "\$${str.substring(0, dotIndex)}.$cents"
     }
     return "\$${str}.00"
 }
@@ -197,7 +195,7 @@ fun KpiCard(
     title: String,
     value: String,
     subtitle: String,
-    icon: androidx.compose.material3.ImageVector,
+    icon: ImageVector,
     iconColor: Color,
     gradientColor: Color
 ) {

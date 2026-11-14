@@ -12,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
+import androidx.compose.material3.ImageVector
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,7 +37,7 @@ fun StockScreen(modifier: Modifier = Modifier) {
     val viewModel: StockViewModel = viewModel {
         StockViewModel(app.movementRepository)
     }
-    val stockByProduct by viewModel.stockByProduct.collectAsState()
+    val stockByProduct by viewModel.stockByProduct.collectAsState().value
 
     SandeTheme {
         Scaffold(

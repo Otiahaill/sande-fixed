@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
+import androidx.compose.material3.ImageVector
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +37,7 @@ fun SalesScreen(modifier: Modifier = Modifier) {
     val viewModel: SalesViewModel = viewModel {
         SalesViewModel(app.movementRepository, app.productRepository)
     }
-    val cart by viewModel.cart.collectAsState()
+    val cart by viewModel.cart.collectAsState().value
 
     SandeTheme {
         Scaffold(

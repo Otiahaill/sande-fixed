@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
+import androidx.compose.material3.ImageVector
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,7 +39,7 @@ fun CatalogueScreen(modifier: Modifier = Modifier) {
     val viewModel: CatalogueViewModel = viewModel {
         CatalogueViewModel(app.productRepository)
     }
-    val products by viewModel.products.collectAsState()
+    val products by viewModel.products.collectAsState().value
 
     SandeTheme {
         Scaffold(
@@ -102,7 +105,7 @@ fun CatalogueScreen(modifier: Modifier = Modifier) {
 fun EmptyStateCard(
     title: String,
     subtitle: String,
-    icon: androidx.compose.material3.ImageVector
+    icon: ImageVector
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().height(120.dp),

@@ -66,7 +66,7 @@ private fun ShellScreen(navController: androidx.navigation.NavHostController) {
                 selectedItemIndex = selectedIndex,
                 onItemClick = { index ->
                     navController.navigate(routes[index]) {
-                        popUpTo(navController.graph.findStartDestination().route) {
+                        popUpTo(navController.graph.startDestinationRoute) {
                             inclusive = true
                         }
                         launchSingleTop = true
