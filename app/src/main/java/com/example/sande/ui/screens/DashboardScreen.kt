@@ -35,27 +35,26 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sande.di.SandeApplication
 import com.example.sande.data.entities.Product
 import com.example.sande.ui.theme.SandeShape
 import com.example.sande.ui.viewmodel.CatalogueViewModel
 import com.example.sande.ui.viewmodel.StockViewModel
-import dagger.hilt.android.lifecycle.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalView
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: CatalogueViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
+    val viewModel: CatalogueViewModel = viewModel {
         CatalogueViewModel(app.productRepository)
     }
-    val stockViewModel: StockViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
+    val stockViewModel: StockViewModel = viewModel {
         StockViewModel(app.movementRepository)
     }
-    val products by viewModel.products.collectAsState().value
-    val stockByProduct by stockViewModel.stockByProduct.collectAsState().value
+    val products by viewModel.products.collectAsState()
+    val stockByProduct by stockViewModel.stockByProduct.collectAsState()
 
     val totalInventoryValue = products.sumOf { p ->
         val stock = stockByProduct[p.id] ?: 0L
@@ -108,7 +107,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             ) {
                 KpiCard(
                     title = "Total Inventory Value",
-                    value = "\$${totalInventoryValue.toString().takeWhile { it != '.' }}${totalInventoryValue.toString().substring(Math.min(totalInventoryValue.toString().indexOf('.'), totalInventoryValue.toString().length - 1))}",
+                    value = formatCurrency(totalInventoryValue),
                     subtitle = "Across all products",
                     icon = Icons.Default.Inventory,
                     iconColor = MaterialTheme.colorScheme.primary,
@@ -179,6 +178,18 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
 }
 
 /**
+ * Format currency value
+ */
+private fun formatCurrency(value: Double): String {
+    val str = value.toString()
+    val dotIndex = str.indexOf('.')
+    if (dotIndex >= 0) {
+        return "\$${str.substring(0, dotIndex)}.${str.substring(dotIndex + 1, minOf(dotIndex + 3, str.length))}"
+    }
+    return "\$${str}.00"
+}
+
+/**
  * KPI Card with gradient background, large value, and icon
  */
 @Composable
@@ -190,7 +201,8 @@ fun KpiCard(
     iconColor: Color,
     gradientColor: Color
 ) {
-    val cardWidth = (LocalContext.current.resources.displayMetrics.widthPixels / LocalContext.current.resources.displayMetrics.density - 36 - 24) / 3.0
+    val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels / LocalContext.current.resources.displayMetrics.density
+    val cardWidth = (screenWidth - 36 - 24) / 3.0
 
     Card(
         modifier = Modifier

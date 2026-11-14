@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,7 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 fun SalesScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: SalesViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
+    val viewModel: SalesViewModel = viewModel {
         SalesViewModel(app.movementRepository, app.productRepository)
     }
     val cart by viewModel.cart.collectAsState()

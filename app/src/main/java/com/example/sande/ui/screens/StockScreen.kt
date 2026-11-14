@@ -4,10 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
 import androidx.compose.material3.ListItem
@@ -31,18 +33,17 @@ import androidx.compose.ui.platform.LocalContext
 fun StockScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: StockViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
+    val viewModel: StockViewModel = viewModel {
         StockViewModel(app.movementRepository)
     }
-    val stockByProduct by viewModel.stockByProduct.collectAsState().value
+    val stockByProduct by viewModel.stockByProduct.collectAsState()
 
     SandeTheme {
         Scaffold(
             floatingActionButton = {
-                androidx.compose.material3.FloatingActionButton(
+                FloatingActionButton(
                     onClick = { /* receive stock */ },
                     containerColor = MaterialTheme.colorScheme.primary,
-                    backgroundColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = RoundedCornerShape(12.dp)
                 ) {

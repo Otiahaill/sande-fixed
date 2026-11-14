@@ -26,7 +26,7 @@ import com.example.sande.ui.screens.SignInScreen
 import com.example.sande.ui.screens.SplashScreen
 import com.example.sande.ui.screens.DashboardScreen
 
-sealed object AppRoute {
+sealed class AppRoute {
     object Splash : AppRoute()
     object SignIn : AppRoute()
     object Shell : AppRoute()
