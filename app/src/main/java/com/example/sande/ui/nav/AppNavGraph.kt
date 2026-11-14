@@ -1,88 +1,119 @@
 package com.example.sande.ui.nav
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.BottomNavigation
+import androidx.compose.material3.BottomNavigationItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Icons
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberSaveable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.sande.ui.theme.SandeTheme
 import com.example.sande.ui.screens.CatalogueScreen
+import com.example.sande.ui.screens.StockScreen
 import com.example.sande.ui.screens.SalesScreen
 import com.example.sande.ui.screens.SettingsScreen
 import com.example.sande.ui.screens.SignInScreen
 import com.example.sande.ui.screens.SplashScreen
-import com.example.sande.ui.screens.StockScreen
+import com.example.sande.ui.screens.DashboardScreen
 
-private const val ROUTE_SPLASH = "splash"
-private const val ROUTE_SIGN_IN = "signin"
-private const val ROUTE_SHELL = "shell"
+sealed object AppRoute {
+    object Splash : AppRoute()
+    object SignIn : AppRoute()
+    object Shell : AppRoute()
+    object Dashboard : AppRoute()
+    object Catalogue : AppRoute()
+    object Stock : AppRoute()
+    object Sales : AppRoute()
+    object Settings : AppRoute()
+}
 
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = ROUTE_SPLASH) {
-        composable(ROUTE_SPLASH) {
-            SplashScreen(onFinished = {
-                navController.navigate(ROUTE_SIGN_IN) { popUpTo(ROUTE_SPLASH) { inclusive = true } }
-            })
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") { SplashScreen(onSignedIn = { navController.navigate("shell") }) }
+        composable("signin") { SignInScreen(onSignedIn = { navController.navigate("shell") }) }
+        composable("shell") {
+            ShellScreen(navController = navController)
         }
-        composable(ROUTE_SIGN_IN) {
-            SignInScreen(onSignedIn = {
-                navController.navigate(ROUTE_SHELL) { popUpTo(ROUTE_SIGN_IN) { inclusive = true } }
-            })
-        }
-        composable(ROUTE_SHELL) { ShellScreen() }
+        composable("dashboard") { DashboardScreen() }
+        composable("catalogue") { CatalogueScreen() }
+        composable("stock") { StockScreen() }
+        composable("sales") { SalesScreen() }
+        composable("settings") { SettingsScreen() }
     }
 }
 
-private data class Tab(val label: String, val icon: ImageVector)
-
 @Composable
-private fun ShellScreen() {
-    var selected by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf(
-        Tab("Catalogue", Icons.Default.List),
-        Tab("Stock", Icons.Default.Home),
-        Tab("Sales", Icons.Default.ShoppingCart),
-        Tab("Settings", Icons.Default.Settings)
-    )
+private fun ShellScreen(navController: androidx.navigation.NavHostController) {
+    val selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    val routes = listOf("dashboard", "catalogue", "stock", "sales", "settings")
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                tabs.forEachIndexed { index, tab ->
-                    NavigationBarItem(
-                        selected = selected == index,
-                        onClick = { selected = index },
-                        icon = { Icon(tab.icon, contentDescription = tab.label) },
-                        label = { Text(tab.label) }
-                    )
-                }
+            BottomNavigation(
+                selectedItemIndex = selectedIndex,
+                onItemClick = { index ->
+                    navController.navigate(routes[index]) {
+                        popUpTo(navController.graph.findStartDestination().route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
+            ) {
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                    label = { Text(stringResource(id = com.example.sande.R.string.tab_dashboard)) },
+                    selected = selectedIndex == 0,
+                    onClick = {}
+                )
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Default.Inventory, contentDescription = null) },
+                    label = { Text(stringResource(id = com.example.sande.R.string.tab_catalogue)) },
+                    selected = selectedIndex == 1,
+                    onClick = {}
+                )
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Default.Storage, contentDescription = null) },
+                    label = { Text(stringResource(id = com.example.sande.R.string.tab_stock)) },
+                    selected = selectedIndex == 2,
+                    onClick = {}
+                )
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
+                    label = { Text(stringResource(id = com.example.sande.R.string.tab_sales)) },
+                    selected = selectedIndex == 3,
+                    onClick = {}
+                )
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                    label = { Text(stringResource(id = com.example.sande.R.string.tab_settings)) },
+                    selected = selectedIndex == 4,
+                    onClick = {}
+                )
             }
         }
     ) { innerPadding ->
-        val m = Modifier.padding(innerPadding)
-        when (selected) {
-            0 -> CatalogueScreen(modifier = m)
-            1 -> StockScreen(modifier = m)
-            2 -> SalesScreen(modifier = m)
-            else -> SettingsScreen(modifier = m)
+        when (routes[selectedIndex]) {
+            "dashboard" -> DashboardScreen(modifier = Modifier.padding(innerPadding))
+            "catalogue" -> CatalogueScreen(modifier = Modifier.padding(innerPadding))
+            "stock" -> StockScreen(modifier = Modifier.padding(innerPadding))
+            "sales" -> SalesScreen(modifier = Modifier.padding(innerPadding))
+            "settings" -> SettingsScreen(modifier = Modifier.padding(innerPadding))
         }
     }
 }
