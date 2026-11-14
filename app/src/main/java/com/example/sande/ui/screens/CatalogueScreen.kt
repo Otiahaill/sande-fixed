@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,13 +13,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
 import androidx.compose.material3.ImageVector
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,15 +32,15 @@ import androidx.compose.ui.platform.LocalContext
 fun CatalogueScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: CatalogueViewModel = viewModel {
+    val viewModel: CatalogueViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
         CatalogueViewModel(app.productRepository)
     }
-    val products by viewModel.products.collectAsState().value
+    val products by viewModel.products.collectAsState()
 
     SandeTheme {
-        Scaffold(
+        androidx.compose.material3.Scaffold(
             floatingActionButton = {
-                FloatingActionButton(
+                androidx.compose.material3.FloatingActionButton(
                     onClick = { viewModel.seed() },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -114,7 +110,7 @@ fun EmptyStateCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
         )
     ) {
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
@@ -162,12 +158,11 @@ fun ProductCard(
             MaterialTheme.colorScheme.outlineVariant
         )
     ) {
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product icon
-            androidx.compose.foundation.layout.Box(
+            Box(
                 modifier = Modifier.size(40.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -181,7 +176,7 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.bodyLarge,
@@ -210,7 +205,6 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Chevron
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
@@ -219,4 +213,64 @@ fun ProductCard(
             )
         }
     }
+}
+
+/**
+ * Simple Box wrapper
+ */
+@Composable
+fun Box(
+    modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.TopLeft,
+    content: @Composable () -> Unit = {}
+) {
+    androidx.compose.foundation.layout.Box(
+        modifier = modifier,
+        contentAlignment = contentAlignment,
+        content = content
+    )
+}
+
+/**
+ * Simple Column wrapper
+ */
+@Composable
+fun Column(
+    modifier: Modifier = Modifier,
+    verticalArrangement: androidx.compose.foundation.layout.Arrangement.Vertical = androidx.compose.foundation.layout.Arrangement.Top,
+    horizontalAlignment: androidx.compose.foundation.layout.Alignment.Horizontal = androidx.compose.foundation.layout.Alignment.Start,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        content = content
+    )
+}
+
+/**
+ * Simple Row wrapper
+ */
+@Composable
+fun Row(
+    modifier: Modifier = Modifier,
+    verticalAlignment: androidx.compose.foundation.layout.Alignment.Vertical = androidx.compose.foundation.layout.Alignment.Top,
+    horizontalArrangement: androidx.compose.foundation.layout.Arrangement.Horizontal = androidx.compose.foundation.layout.Arrangement.Start,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.Row(
+        modifier = modifier,
+        verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        content = content
+    )
+}
+
+/**
+ * Simple Spacer
+ */
+@Composable
+fun Spacer(modifier: Modifier = Modifier) {
+    androidx.compose.foundation.layout.Spacer(modifier = modifier)
 }

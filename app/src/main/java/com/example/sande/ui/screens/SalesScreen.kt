@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,13 +14,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
 import androidx.compose.material3.ImageVector
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,10 +31,10 @@ import androidx.compose.ui.platform.LocalContext
 fun SalesScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: SalesViewModel = viewModel {
+    val viewModel: SalesViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
         SalesViewModel(app.movementRepository, app.productRepository)
     }
-    val cart by viewModel.cart.collectAsState().value
+    val cart by viewModel.cart.collectAsState()
 
     SandeTheme {
         Scaffold(
@@ -80,7 +77,7 @@ fun SalesScreen(modifier: Modifier = Modifier) {
                     )
                 } else {
                     LazyColumn(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth(),
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 8.dp)
                     ) {
                         items(cart, key = { it.productId }) { item ->
@@ -102,7 +99,7 @@ fun SalesScreen(modifier: Modifier = Modifier) {
                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                     )
                 ) {
-                    androidx.compose.foundation.layout.Column(
+                    Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Row(
@@ -114,7 +111,7 @@ fun SalesScreen(modifier: Modifier = Modifier) {
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.width(0.dp))
                             Text(
                                 text = "\$${viewModel.subtotalCents / 100}.${viewModel.subtotalCents % 100}",
                                 style = MaterialTheme.typography.titleLarge,
@@ -148,11 +145,11 @@ fun CartItemRow(
             MaterialTheme.colorScheme.outlineVariant
         )
     ) {
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            androidx.compose.foundation.layout.Box(
+            Box(
                 modifier = Modifier.size(36.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -166,7 +163,7 @@ fun CartItemRow(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = item.productName,
                     style = MaterialTheme.typography.bodyLarge,

@@ -18,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 fun SettingsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: SettingsViewModel = viewModel {
+    val viewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
         SettingsViewModel(app.authRepository)
     }
 
@@ -165,21 +165,55 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
  */
 @Composable
 fun DividerItem() {
-    androidx.compose.foundation.layout.Row(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.foundation.layout.Box(
+        Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.foundation.layout.Box(
+            Box(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
         }
     }
+}
+
+/**
+ * Simple Box wrapper
+ */
+@Composable
+fun Box(
+    modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.TopLeft,
+    content: @Composable () -> Unit = {}
+) {
+    androidx.compose.foundation.layout.Box(
+        modifier = modifier,
+        contentAlignment = contentAlignment,
+        content = content
+    )
+}
+
+/**
+ * Simple Row wrapper
+ */
+@Composable
+fun Row(
+    modifier: Modifier = Modifier,
+    verticalAlignment: androidx.compose.foundation.layout.Alignment.Vertical = androidx.compose.foundation.layout.Alignment.Top,
+    horizontalArrangement: androidx.compose.foundation.layout.Arrangement.Horizontal = androidx.compose.foundation.layout.Arrangement.Start,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.Row(
+        modifier = modifier,
+        verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        content = content
+    )
 }

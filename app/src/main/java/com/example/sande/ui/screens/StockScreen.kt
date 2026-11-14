@@ -13,13 +13,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Icons
 import androidx.compose.material3.ImageVector
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,10 +32,10 @@ import androidx.compose.ui.platform.LocalContext
 fun StockScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val app = context.applicationContext as SandeApplication
-    val viewModel: StockViewModel = viewModel {
+    val viewModel: StockViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
         StockViewModel(app.movementRepository)
     }
-    val stockByProduct by viewModel.stockByProduct.collectAsState().value
+    val stockByProduct by viewModel.stockByProduct.collectAsState()
 
     SandeTheme {
         Scaffold(
@@ -127,12 +125,11 @@ fun StockRow(
             MaterialTheme.colorScheme.outlineVariant
         )
     ) {
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product icon placeholder
-            androidx.compose.foundation.layout.Box(
+            Box(
                 modifier = Modifier.size(40.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -146,7 +143,7 @@ fun StockRow(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Product $productId",
                     style = MaterialTheme.typography.bodyLarge,
@@ -158,7 +155,7 @@ fun StockRow(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    androidx.compose.foundation.layout.Box(
+                    Box(
                         modifier = Modifier
                             .width(24.dp)
                             .height(16.dp)

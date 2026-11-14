@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,11 +25,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DrawScope
-import androidx.compose.ui.graphics.canvas.Canvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sande.di.SandeApplication
 import com.example.sande.data.entities.Product
 import com.example.sande.ui.theme.SandeShape
@@ -49,8 +44,8 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
     val stockViewModel: StockViewModel = viewModel {
         StockViewModel(app.movementRepository)
     }
-    val products: List<Product> by viewModel.products.collectAsState().value
-    val stockByProduct: Map<String, Long> by stockViewModel.stockByProduct.collectAsState().value
+    val products: List<Product> by viewModel.products.collectAsState()
+    val stockByProduct: Map<String, Long> by stockViewModel.stockByProduct.collectAsState()
 
     val totalInventoryValue = products.sumOf { p ->
         val stock = stockByProduct[p.id] ?: 0L
@@ -67,14 +62,13 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         stock * p.priceCents
     } / 100.0
 
-    androidx.compose.foundation.layout.Box(
+    Box(
         modifier = modifier.fillMaxSize()
     ) {
-        androidx.compose.foundation.layout.Column(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .windowInsetsPadding(WindowInsets.safeDrawing)
         ) {
             // Header
             Row(
@@ -128,11 +122,6 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
-            // Sales Chart Card
-            SalesChartCard()
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Inventory Section Header
             Row(
@@ -212,7 +201,7 @@ fun KpiCard(
         ),
         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        androidx.compose.foundation.layout.Column(
+        Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -221,11 +210,11 @@ fun KpiCard(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                androidx.compose.foundation.layout.Box(
+                Box(
                     modifier = Modifier.size(36.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.compose.foundation.layout.Box(
+                    Box(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
@@ -238,13 +227,13 @@ fun KpiCard(
                         modifier = Modifier.size(20.dp)
                     )
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(0.dp))
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             // Title
-            androidx.compose.foundation.layout.Column(
+            Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 Text(
@@ -272,83 +261,11 @@ fun KpiCard(
 }
 
 /**
- * Sales Chart Card with bar chart visualization
- */
-@Composable
-fun SalesChartCard() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        shape = SandeShape.card,
-        colors = androidx.compose.material3.CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
-    ) {
-        androidx.compose.foundation.layout.Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Text(
-                text = "Recent Sales",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Canvas(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            ) {
-                val barWidth = 24f
-                val barSpacing = 16f
-                val chartWidth = size.width
-                val chartHeight = size.height
-                val maxValue = 200f
-
-                val values = floatArrayOf(80f, 120f, 95f, 160f, 140f, 200f, 110f, 175f, 130f, 190f)
-                val labels = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed")
-
-                val availableWidth = chartWidth - (barSpacing * (values.size - 1)) - barWidth * values.size
-                val startX = availableWidth / 2
-
-                values.forEachIndexed { index, value ->
-                    val x = startX + index * (barWidth + barSpacing)
-                    val barHeight = (value / maxValue) * (chartHeight - 24)
-                    val y = chartHeight - barHeight - 8
-
-                    // Bar
-                    drawRect(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
-                        topLeft = androidx.compose.ui.geometry.Offset(x, y),
-                        size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
-                    )
-                }
-
-                // Y-axis labels
-                val yLabels = listOf("\$0", "\$50", "\$100", "\$150", "\$200")
-                yLabels.forEachIndexed { index, label ->
-                    val y = chartHeight - (index * 24f) - 8
-                    drawText(
-                        text = label,
-                        topLeft = androidx.compose.ui.geometry.Offset(0f, y - 6f),
-                        fontSize = 10.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
  * Inventory Row with stock level indicator
  */
 @Composable
 fun InventoryRow(product: Product, stock: Long) {
     val isLowStock = stock <= 5
-    val stockColor = if (isLowStock) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
 
     Row(
         modifier = Modifier
@@ -357,7 +274,7 @@ fun InventoryRow(product: Product, stock: Long) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Product icon placeholder
-        androidx.compose.foundation.layout.Box(
+        Box(
             modifier = Modifier.size(40.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -372,7 +289,7 @@ fun InventoryRow(product: Product, stock: Long) {
         Spacer(modifier = Modifier.width(12.dp))
 
         // Product info
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = product.name,
                 style = MaterialTheme.typography.bodyLarge,
@@ -422,4 +339,64 @@ fun InventoryRow(product: Product, stock: Long) {
             modifier = Modifier.width(70.dp)
         )
     }
+}
+
+/**
+ * Simple Box alias for common usage
+ */
+@Composable
+fun Box(
+    modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.TopLeft,
+    content: @Composable () -> Unit = {}
+) {
+    androidx.compose.foundation.layout.Box(
+        modifier = modifier,
+        contentAlignment = contentAlignment,
+        content = content
+    )
+}
+
+/**
+ * Simple Column alias
+ */
+@Composable
+fun Column(
+    modifier: Modifier = Modifier,
+    verticalArrangement: androidx.compose.foundation.layout.Arrangement.Vertical = androidx.compose.foundation.layout.Arrangement.Top,
+    horizontalAlignment: androidx.compose.foundation.layout.Alignment.Horizontal = androidx.compose.foundation.layout.Alignment.Start,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        content = content
+    )
+}
+
+/**
+ * Simple Row alias
+ */
+@Composable
+fun Row(
+    modifier: Modifier = Modifier,
+    verticalAlignment: androidx.compose.foundation.layout.Alignment.Vertical = androidx.compose.foundation.layout.Alignment.Top,
+    horizontalArrangement: androidx.compose.foundation.layout.Arrangement.Horizontal = androidx.compose.foundation.layout.Arrangement.Start,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.Row(
+        modifier = modifier,
+        verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        content = content
+    )
+}
+
+/**
+ * Simple Spacer
+ */
+@Composable
+fun Spacer(modifier: Modifier = Modifier) {
+    androidx.compose.foundation.layout.Spacer(modifier = modifier)
 }

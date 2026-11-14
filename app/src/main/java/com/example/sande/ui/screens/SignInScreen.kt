@@ -30,7 +30,7 @@ fun SignInScreen(onSignedIn: () -> Unit) {
     var password by remember { mutableStateOf("") }
 
     SandeTheme {
-        androidx.compose.foundation.layout.Column(
+        Column(
             modifier = Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -84,7 +84,7 @@ fun SignInScreen(onSignedIn: () -> Unit) {
 }
 
 /**
- * Spacer helper
+ * Simple Spacer
  */
 @Composable
 fun Spacer(modifier: Modifier = Modifier) {
